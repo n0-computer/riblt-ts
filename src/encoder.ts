@@ -44,8 +44,8 @@ class MappingHeap {
       if (this.m[curr].codedIdx <= this.m[child].codedIdx) {
         break
       }
-      // swap
-      this.m[curr], this.m[child] = this.m[child], this.m[curr]
+      // swap values
+      [this.m[curr], this.m[child]] = [this.m[child], this.m[curr]]
       curr = child
     }
   }
@@ -54,14 +54,12 @@ class MappingHeap {
   // just inserted.
   fixTail() {
     let curr = this.m.length - 1
-    console.log('fixTail', this)
     while (true) {
       let parent = Math.abs(Math.round((curr - 1) / 2))
-      console.log('parent', parent)
       if (curr == parent || this.m[parent].codedIdx <= this.m[curr].codedIdx) {
         break
       }
-      this.m[parent], this.m[curr] = this.m[curr], this.m[parent]
+      [this.m[parent], this.m[curr]] = [this.m[curr], this.m[parent]]
       curr = parent
     }
   }
@@ -74,8 +72,6 @@ export class CodingWindow<T extends Symbol<T>> {
   private mappings: RandomMapping[] = []   // mapping generators of the source symbols
   private queue: MappingHeap = new MappingHeap()       // priority queue of source symbols by the next coded symbols they are mapped to
   private nextIdx:  number = 0               // index of the next coded symbol to be generated
-
-  constructor() {}
 
   getSymbols() {
     return this.symbols
@@ -115,7 +111,7 @@ export class CodingWindow<T extends Symbol<T>> {
       return cw
     }
     while (this.queue.get(0).codedIdx === this.nextIdx) {
-      cw = cw.applySymbol(this.symbols[this.queue.get(0).sourceIdx], direction)
+      cw = cw.appli(this.symbols[this.queue.get(0).sourceIdx], direction)
       // generate the next mapping
       let nextMap = this.mappings[this.queue.get(0).sourceIdx].nextIndex()
       this.queue.get(0).codedIdx = nextMap

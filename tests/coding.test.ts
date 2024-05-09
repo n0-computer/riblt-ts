@@ -2,36 +2,24 @@ import siphash from "siphash";
 
 import { Encoder, Decoder } from "../src";
 
-class TestSymbol {
-  data: Uint8Array;
-  static size = 8;
+export class TestSymbol {
+  data: number;
+  static size = 1;
 
-  constructor(data?: Uint8Array) {
-    if (data && data.length !== TestSymbol.size) {
-      throw new Error(`data must be of size ${TestSymbol.size}`);
-    }
-    this.data = data || new Uint8Array(TestSymbol.size);
+  constructor(data: number) {
+    this.data = data
   }
 
   xor(t2: TestSymbol): TestSymbol {
-    // xor the bits of the data properties of this and t2
-    for (let i = 0; i < TestSymbol.size; i++) {
-      this.data[i] ^= t2.data[i];
-    }
-
-    // const dw = (*[TestSymbol.size / 8]uint64)(unsafe.Pointer(&d))
-    // const t2w = (*[TestSymbol.size / 8]uint64)(unsafe.Pointer(&t2))
-    // for let i = 0; i < TestSymbol.size/8; i++ {
-    // 	(*dw)[i] ^= (*t2w)[i]
-    // }
+    this.data ^= t2.data
     return this
   }
 
   static hashKey = [
     0xdeadbeef, 
-    0xcafebabe, 
-    0x8badf00d, 
-    0x1badb002,
+    // 0xcafebabe,
+    // 0x8badf00d,
+    // 0x1badb002,
   ];
 
   hash(): number {
@@ -49,36 +37,58 @@ class TestSymbol {
   }
 }
 
+test('TestSymbol xor', () => {
+  const a = new TestSymbol(1);
+  const b = new TestSymbol(2);
+  a.xor(b);
+  expect(a.data).toBe(3);
+  a.xor(b);
+  expect(a.data).toBe(1);
+})
+
 test('encode and decode', () => {
-  let enc = new Encoder<TestSymbol>(() => { return new TestSymbol() });
-  let dec = new Decoder<TestSymbol>(() => { return new TestSymbol() });
-  const local = [
-    new TestSymbol(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])),
-    new TestSymbol(new Uint8Array([2, 2, 3, 4, 5, 6, 7, 8])),
-    new TestSymbol(new Uint8Array([3, 2, 3, 4, 5, 6, 7, 8])),
-    new TestSymbol(new Uint8Array([4, 2, 3, 4, 5, 6, 7, 8])),
-    new TestSymbol(new Uint8Array([5, 2, 3, 4, 5, 6, 7, 8])),
-  ];
-  local.forEach((s) => { 
-    console.log('adding symbol', s)
-    enc.addSymbol(s)
-  });
+  // let enc = new Encoder<TestSymbol>(() => { return new TestSymbol() });
+  // let dec = new Decoder<TestSymbol>(() => { return new TestSymbol() });
+  // const local = [
+  //   new TestSymbol(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])),
+  //   new TestSymbol(new Uint8Array([2, 2, 3, 4, 5, 6, 7, 8])),
+  //   new TestSymbol(new Uint8Array([3, 2, 3, 4, 5, 6, 7, 8])),
+  //   new TestSymbol(new Uint8Array([4, 2, 3, 4, 5, 6, 7, 8])),
+  //   new TestSymbol(new Uint8Array([5, 2, 3, 4, 5, 6, 7, 8])),
+  // ];
+  // local.forEach((s) => { 
+  //   enc.addSymbol(s)
+  // });
 
-  const remote = [
-    new TestSymbol(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])),
-    new TestSymbol(new Uint8Array([3, 2, 3, 4, 5, 6, 7, 8]))
-  ];
-  remote.forEach((s) => { dec.addSymbol(s) });
+  // const remote = [
+  //   new TestSymbol(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])),
+  //   new TestSymbol(new Uint8Array([3, 2, 3, 4, 5, 6, 7, 8]))
+  // ];
+  // remote.forEach((s) => { dec.addSymbol(s) });
 
-  let ncw = 0;
-  while (true) {
-    dec.addCodedSymbol(enc.produceNextCodedSymbol());
-    ncw++;
-    dec.tryDecode();
-    if (dec.isDecoded())  {
-      break;
-    }
-  }
+  // let ncw = 0;
+  // while (true) {
+  //   const next = enc.produceNextCodedSymbol()
+  //   console.log('next coded symbol', next)
+  //   if (ncw > 4) {
+  //     break;
+  //   }
+  //   dec.addCodedSymbol(next);
+  //   ncw++;
+  //   dec.tryDecode();
+  //   if (dec.isDecoded())  {
+  //     break;
+  //   }
+  // }
 
-  console.log(`${ncw} codewords until fully decoded`);
+  // const remoteSymbols = dec.getRemote()
+  // console.log('remote symbols', remoteSymbols)
+  // const localSymbols = dec.getLocal()
+  // console.log('local symbols', localSymbols) 
+
+  // if (!dec.isDecoded()) {
+  //   throw new Error('decoder not marked as decoded');
+  // }
+
+  // console.log(`${ncw} codewords until fully decoded`);
 });

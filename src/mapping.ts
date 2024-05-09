@@ -7,7 +7,7 @@
 // with probability 1/(1+i/2), for any non-negative i.
 export class RandomMapping {
 	private prng: number // PRNG state
-	lastIdx: number // the last index the symbol was mapped to
+	public lastIdx: number // the last index the symbol was mapped to
 
   constructor(prng: number, lastIdx: number) {
     this.prng = prng

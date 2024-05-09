@@ -41,7 +41,7 @@ export class CodedSymbol<T extends Symbol<T>> {
 
   // apply maps s to c and modifies the counter of c according to direction. add
   // increments the counter, and remove decrements the counter.
-  applySymbol(s: HashedSymbol<T>, direction: number): CodedSymbol<T> {
+  appli(s: HashedSymbol<T>, direction: number): CodedSymbol<T> {
     this.symbol = this.symbol.xor(s.symbol)
     this.hash ^= s.hash
     this.count += direction

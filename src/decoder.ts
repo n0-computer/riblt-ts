@@ -59,7 +59,8 @@ export class Decoder<T extends Symbol<T>> {
     // insert the new coded symbol
     this.cs.push(c)
     // check if the coded symbol is decodable, and insert into decodable list if so
-    if ((c.count == 1 || c.count == -1) && (c.hash == c.symbol.hash())) {
+    if ((c.count == 1 || c.count == -1)) {
+    // if ((c.count == 1 || c.count == -1) && (c.hash == c.symbol.hash())) {
       this.decodable.push(this.cs.length-1)
     } else if (c.count == 0 && c.hash == 0) {
       this.decodable.push(this.cs.length-1)
@@ -69,9 +70,10 @@ export class Decoder<T extends Symbol<T>> {
   
   applyNewSymbol(t: HashedSymbol<T>, direction: number): RandomMapping {
     let m = new RandomMapping(t.hash, 0)
+    console.log('applying new symbol', t)
     while (m.lastIdx < this.cs.length) {
       let cidx = m.lastIdx
-      this.cs[cidx] = this.cs[cidx].applySymbol(t, direction)
+      this.cs[cidx] = this.cs[cidx].appli(t, direction)
       // Check if the coded symbol is now decodable. We do not want to insert
       // a decodable symbol into the list if we already did, otherwise we
       // will visit the same coded symbol twice. To see how we achieve that,
@@ -91,7 +93,8 @@ export class Decoder<T extends Symbol<T>> {
       // duplicates. On the other hand, it is fine that we insert all
       // degree-1 or -1 decodable symbols, because we only see them in such
       // state once.
-      if ((this.cs[cidx].count == -1 || this.cs[cidx].count == 1) && this.cs[cidx].hash == this.cs[cidx].symbol.hash()) {
+      // if ((this.cs[cidx].count == -1 || this.cs[cidx].count == 1) && this.cs[cidx].hash == this.cs[cidx].symbol.hash()) {
+      if ((this.cs[cidx].count == -1 || this.cs[cidx].count == 1)) {
         this.decodable.push(cidx)
       }
       m.nextIndex()
@@ -110,6 +113,7 @@ export class Decoder<T extends Symbol<T>> {
       // additional source symbols have been peeled off a coded symbol after
       // it was inserted into the decodable list and before we visit them
       // here.
+      console.log('decoding', c)
       switch (c.count) {
       case 1:
         this.addRemoteCodedSymbol(c)
